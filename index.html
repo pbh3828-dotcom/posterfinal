@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YUNHA 30th ANNIVERSARY Time Train</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <img src="노란 우산.png" alt="흔들리는 우산" class="rotating-umbrella" />
+
+    <div id="introScreen" class="intro-overlay">
+      <div class="ticket-container" onclick="startJourney()">
+        <div class="ticket-body">
+          <span class="ticket-title">TIME TRAIN</span>
+          <span class="ticket-subtitle">BOARDING PASS</span>
+          <div class="ticket-deco"></div>
+          <p class="click-guide">Click to Board</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="cursorLight" class="cursor-light"></div>
+
+    <div class="background-wrapper">
+      <div class="poster-container" id="posterContainer">
+        <div id="dustContainer" class="dust-container"></div>
+
+        <div id="noteContainer" class="note-container"></div>
+
+        <div
+          class="click-area center-door-area hover-target"
+          onclick="triggerWarp()"
+          title="공간 이동"
+        ></div>
+        <div
+          class="click-area left-window-area hover-target"
+          onclick="playSceneVideo(0)"
+          title="비디오 1"
+        ></div>
+        <div
+          class="click-area second-window-area hover-target"
+          onclick="playSceneVideo(1)"
+          title="비디오 2"
+        ></div>
+        <div
+          class="click-area right-window-area hover-target"
+          onclick="playSceneVideo(2)"
+          title="비디오 3"
+        ></div>
+        <div
+          class="click-area fourth-window-area hover-target"
+          onclick="playSceneVideo(3)"
+          title="비디오 4"
+        ></div>
+
+        <div class="poster-info">
+          <h1>YUNHA 30th ANNIVERSARY</h1>
+          <h2>The Archive of Light</h2>
+          <p class="main-date">2034. 10. 10 - 2035. 01. 30 | Space N Seoul</p>
+        </div>
+
+        <div class="poster-footer">
+          <div class="footer-content">
+            <p>
+              <strong>주최/주관</strong> C9 ENTERTAINMENT &nbsp;|&nbsp;
+              <strong>후원</strong> SEOUL ART CENTER
+            </p>
+            <p><strong>참여 방법</strong> 온라인 사전 예약 및 현장 발권</p>
+            <div class="footer-divider"></div>
+            <p class="contact-info">
+              <strong>문의</strong> 02-3456-7890 &nbsp;|&nbsp;
+              <strong>Web www.younha30th.com</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="videoOverlay">
+      <div class="video-wrapper">
+        <video id="mainVideo" controls width="100%" height="auto">
+          <source src="" type="video/mp4" />
+        </video>
+      </div>
+      <button onclick="closeVideo()" class="close-btn hover-target">
+        X 닫기
+      </button>
+    </div>
+
+    <script>
+      const posterContainer = document.getElementById("posterContainer");
+      const videoOverlay = document.getElementById("videoOverlay");
+      const mainVideo = document.getElementById("mainVideo");
+      const cursorLight = document.getElementById("cursorLight");
+      const introScreen = document.getElementById("introScreen");
+      const noteContainer = document.getElementById("noteContainer");
+
+      const scenes = [
+        {
+          bg: "detail2.png",
+          videos: [
+            "포인트니모1.mp4",
+            "윤하(YOUNHA) - 아이와 나의 바다.mp4",
+            "윤하바람.mp4",
+            "맹그로브1.mp4",
+          ],
+        },
+        {
+          bg: "이미지 변경 첫번째.png",
+          videos: [
+            "별의조각1.mp4",
+            "태양물고기1.mp4",
+            "사건의지평선1.mp4",
+            "기다리다1.mp4",
+          ],
+        },
+        {
+          bg: "이미지 변경 두번째.png",
+          videos: [
+            "우산.mp4",
+            "새녁바람1.mp4",
+            "스물다섯1.mp4",
+            "비밀번호.mp4",
+          ],
+        },
+      ];
+
+      let currentIndex = 0;
+      let isWarping = false;
+
+      function playSceneVideo(windowIndex) {
+        const videoSrc = scenes[currentIndex].videos[windowIndex];
+        if (!videoSrc) {
+          alert("이 창문에는 아직 영상이 준비되지 않았습니다!");
+          return;
+        }
+        openVideo(videoSrc);
+      }
+
+      function triggerWarp() {
+        if (isWarping) return;
+        isWarping = true;
+        posterContainer.classList.add("warping");
+        setTimeout(() => {
+          currentIndex = (currentIndex + 1) % scenes.length;
+          const nextImage = scenes[currentIndex].bg;
+          posterContainer.style.backgroundImage = `url('${nextImage}')`;
+        }, 1500);
+        setTimeout(() => {
+          posterContainer.classList.remove("warping");
+          isWarping = false;
+        }, 3000);
+      }
+
+      function openVideo(videoSrc) {
+        closeVideo();
+        mainVideo.src = videoSrc;
+        videoOverlay.style.display = "flex";
+        mainVideo.play().catch((e) => console.log("error:", e));
+      }
+
+      function closeVideo() {
+        videoOverlay.style.display = "none";
+        mainVideo.pause();
+        mainVideo.src = "";
+      }
+
+      function startJourney() {
+        introScreen.classList.add("fade-out");
+        setTimeout(() => {
+          introScreen.style.display = "none";
+        }, 2000);
+      }
+
+      document.addEventListener("mousemove", (e) => {
+        cursorLight.style.left = e.clientX + "px";
+        cursorLight.style.top = e.clientY + "px";
+      });
+
+      const hoverTargets = document.querySelectorAll(".hover-target");
+      hoverTargets.forEach((target) => {
+        target.addEventListener("mouseenter", () => {
+          cursorLight.classList.add("expand");
+        });
+        target.addEventListener("mouseleave", () => {
+          cursorLight.classList.remove("expand");
+        });
+      });
+
+      function createDust() {
+        const dustContainer = document.getElementById("dustContainer");
+        const dustCount = 60;
+        for (let i = 0; i < dustCount; i++) {
+          const dust = document.createElement("div");
+          dust.classList.add("dust");
+          const x = Math.random() * 100;
+          const y = Math.random() * 100;
+          const duration = Math.random() * 10 + 5;
+          const delay = Math.random() * 5;
+          const size = Math.random() * 3 + 2;
+
+          dust.style.left = `${x}%`;
+          dust.style.top = `${y}%`;
+          dust.style.width = `${size}px`;
+          dust.style.height = `${size}px`;
+          dust.style.animationDuration = `${duration}s`;
+          dust.style.animationDelay = `${delay}s`;
+
+          dustContainer.appendChild(dust);
+        }
+      }
+      createDust();
+
+      function createNotes() {
+        const noteCount = 30;
+        for (let i = 0; i < noteCount; i++) {
+          const note = document.createElement("div");
+          note.classList.add("note");
+
+          // 시작 위치
+          const startX = Math.random() * 100 - 20;
+          const startY = Math.random() * 30 + 80;
+
+          note.style.left = `${startX}%`;
+          note.style.top = `${startY}%`;
+
+          const width = Math.random() * 50 + 30;
+          note.style.width = `${width}px`;
+          note.style.height = `${width * 0.6}px`;
+
+          const moveX = Math.random() * 50 + 100;
+          const moveY = (Math.random() * 50 + 100) * -1;
+          const rotateDeg = (Math.random() - 0.5) * 360;
+
+          const duration = Math.random() * 20 + 20;
+          const delay = Math.random() * 15;
+
+          note.style.animationDuration = `${duration}s`;
+          note.style.animationDelay = `${delay}s`;
+
+          note.style.setProperty("--move-x", `${moveX}%`);
+          note.style.setProperty("--move-y", `${moveY}%`);
+          note.style.setProperty("--rotate-deg", `${rotateDeg}deg`);
+
+          noteContainer.appendChild(note);
+        }
+      }
+      createNotes();
+    </script>
+  </body>
+</html>
